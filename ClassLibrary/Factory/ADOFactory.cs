@@ -1,4 +1,5 @@
-﻿using ClassLibrary.DAL;
+﻿using ClassLibrary.DAL.ADO;
+using ClassLibrary.DAL;
 using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -12,17 +13,17 @@ namespace ClassLibrary.Factory
     {
         public IRepository<Class> GetClassRepository()
         {
-            throw new NotImplementedException();
+            return new ClassRepository();
         }
 
         public IRepository<Journal> GetJournalRepository()
         {
-            throw new NotImplementedException();
+            return new JournalRepository();
         }
 
         public IRepository<Lesson> GetLessonRepository()
         {
-            throw new NotImplementedException();
+            return new LessonRepository();
         }
 
         public IRepository<Person> GetPersonRepository()
@@ -32,37 +33,37 @@ namespace ClassLibrary.Factory
 
         public IRepository<Shedule> GetSheduleRepository()
         {
-            throw new NotImplementedException();
+            return new SheduleRepository();
         }
 
         public IRepository<Specialization> GetSpecializationRepository()
         {
-            throw new NotImplementedException();
+            return new SpecializationRepository();
         }
 
         public IRepository<Student> GetStudentRepository()
         {
-            throw new NotImplementedException();
+            return new StudentRepository();
         }
 
         public IRepository<TaskClass> GetTaskClassRepository()
         {
-            throw new NotImplementedException();
+            return new TaskClassRepository();
         }
 
         public IRepository<Teacher> GetTeacherRepository()
         {
-            throw new NotImplementedException();
+            return new TeacherRepository();
         }
 
         public IRepository<UserInfo> GetUserInfoRepository()
         {
-            throw new NotImplementedException();
+            return new UserInfoRepository();
         }
 
         public IRepository<UserRole> GetUserRoleRepository()
         {
-            throw new NotImplementedException();
+            return new UserRoleRepository();
         }
     }
 }

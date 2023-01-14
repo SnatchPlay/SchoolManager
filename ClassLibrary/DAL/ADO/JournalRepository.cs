@@ -1,7 +1,8 @@
 ﻿using ClassLibrary.Models;
+using System.Data;
 using System.Data.SqlClient;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
     public class JournalRepository : IRepository<Journal>
     {
@@ -12,21 +13,22 @@ namespace ClassLibrary.DAL
         public JournalRepository()
         {
             JournalList = new List<Journal>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [student_id],[day_num],[lesson_id] FROM [Journal]";
+                    comm.CommandText = "SELECT [id],[student_id],[day_num],[lesson_id] FROM [Journal]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
                     {
                         Journal tmp = new Journal();
+                        tmp.Id = (int)reader["id"];
                         tmp.StudentId = (int)reader["student_id"];
                         tmp.DayNum = (int)reader["day_num"];
                         tmp.LessonId = (int)reader["lesson_id"];
@@ -36,7 +38,7 @@ namespace ClassLibrary.DAL
             }
 
         }
-        public void AddObj(Journal tempObj)
+        public void Create(Journal tempObj)
         {
             JournalList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
@@ -53,24 +55,20 @@ namespace ClassLibrary.DAL
                 connectionSql.Close();
             }
             JournalList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             JournalList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            int daynum=0, studentid=0, lessonid=0;
             for (int i = 0; i < JournalList.Count(); i++)
             {
-                if (i == id)
+                if (JournalList[i].Id == id)
                 {
-                    daynum = JournalList[i].DayNum;
-                    studentid = JournalList[i].StudentId;
-                    lessonid = JournalList[i].LessonId;
                     JournalList.RemoveAt(i);
                 }
             }
@@ -78,11 +76,9 @@ namespace ClassLibrary.DAL
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Journal WHERE [student_id]=@stid and [day_num]=@daynum and [lesson_id]=@lnum";
+                string CommandText = "DELETE FROM Journal WHERE id=@Id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@stid", studentid);
-                comm.Parameters.AddWithValue("@daynum", daynum);
-                comm.Parameters.AddWithValue("@lnum", lessonid);
+                comm.Parameters.AddWithValue("@Id", id);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -90,29 +86,28 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Journal> GetEnteties()
+        public List<Journal> GetAll()
         {
             return JournalList;
         }
 
-        public Journal GetObj(int index)
+        public Journal Get(int index)
         {
             return JournalList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Journal obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
+                var cmd = new SqlCommand("spUpdateJournal", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Day_Num", obj.DayNum);
+                cmd.Parameters.AddWithValue("@Student_Id", obj.StudentId);
+                cmd.Parameters.AddWithValue("@Lesson_Id", obj.LessonId);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

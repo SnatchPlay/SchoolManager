@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class TeacherRepository:IRepository<Teacher>
+    public class TeacherRepository : IRepository<Teacher>
     {
         List<Teacher> TeacherList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,16 +18,16 @@ namespace ClassLibrary.DAL
         public TeacherRepository()
         {
             TeacherList = new List<Teacher>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[person_id],[class_id],[specialization_id] FROM [Teachers]";
+                    comm.CommandText = "SELECT [id],[person_id],[class_id],[specialization_id] FROM [Teacher]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -42,13 +43,13 @@ namespace ClassLibrary.DAL
             }
 
         }
-        public void AddObj(Teacher tempObj)
+        public void Create(Teacher tempObj)
         {
             TeacherList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [Teachers]([person_id],[class_id],[specialization_id])" +
+                string CommandText = "INSERT INTO [Teacher]([person_id],[class_id],[specialization_id])" +
                     "VALUES(@pid,@cid,@sid)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
@@ -59,19 +60,19 @@ namespace ClassLibrary.DAL
                 connectionSql.Close();
             }
             TeacherList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             TeacherList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
             for (int i = 0; i < TeacherList.Count(); i++)
             {
-                if (i == id)
+                if (TeacherList[i].Id == id)
                 {
                     TeacherList.RemoveAt(i);
                 }
@@ -80,7 +81,7 @@ namespace ClassLibrary.DAL
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Teachers WHERE id=@id";
+                string CommandText = "DELETE FROM Teacher WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.AddWithValue("@id", id);
                 comm.ExecuteNonQuery();
@@ -90,29 +91,28 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Teacher> GetEnteties()
+        public List<Teacher> GetAll()
         {
             return TeacherList;
         }
 
-        public Teacher GetObj(int index)
+        public Teacher Get(int index)
         {
             return TeacherList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Teacher obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
+                var cmd = new SqlCommand("spUpdateTeacher", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Person_Id", obj.PersonId);
+                cmd.Parameters.AddWithValue("@Class_Id", obj.ClassId);
+                cmd.Parameters.AddWithValue("@Specialization_Id", obj.SpecializationId);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

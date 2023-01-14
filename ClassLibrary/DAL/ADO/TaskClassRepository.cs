@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class TaskClassRepository:IRepository<TaskClass>
+    public class TaskClassRepository : IRepository<TaskClass>
     {
         List<TaskClass> TaskClassList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,41 +18,42 @@ namespace ClassLibrary.DAL
         public TaskClassRepository()
         {
             TaskClassList = new List<TaskClass>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [student_id],[lesson_id],[description],[deadline],[closedtime],[status] FROM [Tasks]";
+                    comm.CommandText = "SELECT [id],[student_id],[lesson_id],[description],[deadline],[closedtime],[status] FROM [Task]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
                     {
                         TaskClass tmp = new TaskClass();
-                        tmp.StudentId= (int)reader["student_id"];
+                        tmp.Id = (int)reader["id"];
+                        tmp.StudentId = (int)reader["student_id"];
                         tmp.LessonId = (int)reader["lesson_id"];
                         tmp.Description = (string)reader["description"];
                         tmp.DeadLine = (DateTime)reader["deadline"];
-                        tmp.CloseTime = (DateTime)reader["closedtime"];
-                        tmp.Status=(bool)reader["status"];
-                        
+                        tmp.ClosedTime = (DateTime)reader["closedtime"];
+                        tmp.Status = (bool)reader["status"];
+
                         TaskClassList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(TaskClass tempObj)
+        public void Create(TaskClass tempObj)
         {
             TaskClassList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [Tasks]([student_id],[lesson_id],[description],[deadline],[closedtime],[status])" +
+                string CommandText = "INSERT INTO [Task]([student_id],[lesson_id],[description],[deadline],[closedtime],[status])" +
                     "VALUES(@sid,@lid,@desc,@deadline,@closedtime,@status)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
@@ -59,31 +61,27 @@ namespace ClassLibrary.DAL
                 comm.Parameters.AddWithValue("@lid", tempObj.LessonId);
                 comm.Parameters.AddWithValue("@desc", tempObj.Description);
                 comm.Parameters.AddWithValue("@deadline", tempObj.DeadLine.ToString("yyyy-MM-dd"));
-                comm.Parameters.AddWithValue("@closedtime", tempObj.CloseTime.ToString("yyyy-MM-dd"));
+                comm.Parameters.AddWithValue("@closedtime", tempObj.ClosedTime.ToString("yyyy-MM-dd"));
                 comm.Parameters.AddWithValue("@status", tempObj.Status);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
             TaskClassList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             TaskClassList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            int student_id = 0,  lessonid = 0;
-            string deadline = DateTime.Today.ToString("yyyy - MM - dd");
             for (int i = 0; i < TaskClassList.Count(); i++)
             {
-                if (i == id)
+                if (TaskClassList[i].Id == id)
                 {
-                    student_id = TaskClassList[i].StudentId;
-                    deadline = TaskClassList[i].DeadLine.ToString("yyyy-MM-dd");
-                    lessonid = TaskClassList[i].LessonId;
+ 
                     TaskClassList.RemoveAt(i);
                 }
             }
@@ -91,12 +89,10 @@ namespace ClassLibrary.DAL
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Tasks WHERE [student_id]=@sid" +
-                    " and [lesson_id]=@lid and [deadline]=@deadline ";
+                string CommandText = "DELETE FROM Task WHERE [id]=@Id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@sid", student_id);
-                comm.Parameters.AddWithValue("@deadline", deadline);
-                comm.Parameters.AddWithValue("@lid", lessonid);
+                comm.Parameters.AddWithValue("@Id", id);
+
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -104,29 +100,32 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<TaskClass> GetEnteties()
+        public List<TaskClass> GetAll()
         {
             return TaskClassList;
         }
 
-        public TaskClass GetObj(int index)
+        public TaskClass Get(int index)
         {
             return TaskClassList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(TaskClass obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
+                var cmd = new SqlCommand("spUpdateTask", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Student_Id", obj.StudentId);
+                cmd.Parameters.AddWithValue("@Lesson_Id", obj.LessonId);
+                cmd.Parameters.AddWithValue("@Description", obj.Description);
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Deadline", obj.DeadLine.ToString("yyyy-MM-dd"));
+                cmd.Parameters.AddWithValue("@Closedtime", obj.ClosedTime.ToString("yyyy-MM-dd"));
+                cmd.Parameters.AddWithValue("@Status", obj.Status);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

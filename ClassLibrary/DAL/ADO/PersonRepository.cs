@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class PersonRepository:IRepository<Person>
+    public class PersonRepository : IRepository<Person>
     {
         List<Person> PersonList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,9 +18,9 @@ namespace ClassLibrary.DAL
         public PersonRepository()
         {
             PersonList = new List<Person>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
@@ -32,19 +33,19 @@ namespace ClassLibrary.DAL
                     while (reader.Read())
                     {
                         Person tmp = new Person();
-                        tmp.PersonId=(int)reader["id"];
-                        tmp.Name=(string)reader["name"];
+                        tmp.Id = (int)reader["id"];
+                        tmp.Name = (string)reader["name"];
                         tmp.Surname = (string)reader["surname"];
                         tmp.Lastname = (string)reader["lastname"];
-                        tmp.BirthDate=(DateTime)reader["birth_date"];
-                        tmp.UserId=(int)reader["user_id"];
+                        tmp.BirthDate = (DateTime)reader["birth_date"];
+                        tmp.UserId = (int)reader["user_id"];
                         PersonList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(Person tempObj)
+        public void Create(Person tempObj)
         {
             PersonList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
@@ -54,7 +55,7 @@ namespace ClassLibrary.DAL
                     "VALUES(@name,@surname,@lastname,@birthdate,@userid)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
-                comm.Parameters.AddWithValue("@name",tempObj.Name);
+                comm.Parameters.AddWithValue("@name", tempObj.Name);
                 comm.Parameters.AddWithValue("@surname", tempObj.Surname);
                 comm.Parameters.AddWithValue("@lastname", tempObj.Lastname);
                 comm.Parameters.AddWithValue("@birth_date", tempObj.BirthDate.ToString("yyyy-MM-dd"));
@@ -63,28 +64,27 @@ namespace ClassLibrary.DAL
                 connectionSql.Close();
             }
             PersonList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             PersonList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
             for (int i = 0; i < PersonList.Count(); i++)
             {
-                if (i == id)
+                if (PersonList[i].Id == id)
                 {
                     PersonList.RemoveAt(i);
                 }
             }
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Person WHERE user_id=@id";
+                string CommandText = "DELETE FROM Person WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.AddWithValue("@id", id);
                 comm.ExecuteNonQuery();
@@ -94,29 +94,31 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Person> GetEnteties()
+        public List<Person> GetAll()
         {
             return PersonList;
         }
 
-        public Person GetObj(int index)
+        public Person Get(int index)
         {
             return PersonList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Person obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
+                var cmd = new SqlCommand("spUpdatePerson", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Name", obj.Name);
+                cmd.Parameters.AddWithValue("@Surname", obj.Surname);
+                cmd.Parameters.AddWithValue("@Lastname", obj.Lastname);
+                cmd.Parameters.AddWithValue("@Birth", obj.BirthDate.ToString("yyyy-MM-dd"));
+                cmd.Parameters.AddWithValue("@User_Id", obj.UserId);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class SheduleRepository:IRepository<Shedule>
+    public class SheduleRepository : IRepository<Shedule>
     {
         List<Shedule> SheduleList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,9 +18,9 @@ namespace ClassLibrary.DAL
         public SheduleRepository()
         {
             SheduleList = new List<Shedule>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
@@ -43,7 +44,7 @@ namespace ClassLibrary.DAL
             }
 
         }
-        public void AddObj(Shedule tempObj)
+        public void Create(Shedule tempObj)
         {
             SheduleList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
@@ -62,17 +63,17 @@ namespace ClassLibrary.DAL
                 connectionSql.Close();
             }
             SheduleList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             SheduleList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            int daynum = 0,lessonum=0, classid = 0,teacherid=0, lessonid = 0;
+            int daynum = 0, lessonum = 0, classid = 0, teacherid = 0, lessonid = 0;
             for (int i = 0; i < SheduleList.Count(); i++)
             {
                 if (i == id)
@@ -80,7 +81,7 @@ namespace ClassLibrary.DAL
                     daynum = SheduleList[i].DayNum;
                     lessonum = SheduleList[i].LessonNum;
                     classid = SheduleList[i].ClassId;
-                    teacherid=SheduleList[i].TeacherId;
+                    teacherid = SheduleList[i].TeacherId;
                     lessonid = SheduleList[i].LessonId;
                     SheduleList.RemoveAt(i);
                 }
@@ -104,29 +105,30 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Shedule> GetEnteties()
+        public List<Shedule> GetAll()
         {
             return SheduleList;
         }
 
-        public Shedule GetObj(int index)
+        public Shedule Get(int index)
         {
             return SheduleList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Shedule obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
+                var cmd = new SqlCommand("spUpdateShedule", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Day_Num", obj.DayNum);
+                cmd.Parameters.AddWithValue("@Lesson_Num", obj.LessonNum);
+                cmd.Parameters.AddWithValue("@Class_Id", obj.ClassId);
+                cmd.Parameters.AddWithValue("@Teacher_Id", obj.TeacherId);
+                cmd.Parameters.AddWithValue("@Lesson_Id", obj.LessonId);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

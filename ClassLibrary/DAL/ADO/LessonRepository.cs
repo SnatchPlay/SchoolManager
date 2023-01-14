@@ -1,82 +1,83 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class ClassRepository:IRepository<Class>
+    public class LessonRepository : IRepository<Lesson>
     {
-        List<Class> ClassList;
+        List<Lesson> LessonList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
         //protected string connStr = "Data Source=DESKTOP-SO70MLO;Initial Catalog=Trade v.2;Integrated Security=True";
 
-        public ClassRepository()
+        public LessonRepository()
         {
-            ClassList = new List<Class>();
-            ReadFromDB();
+            LessonList = new List<Lesson>();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[name] FROM [Classes]";
+                    comm.CommandText = "SELECT [id],[title] FROM [Lesson]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
                     {
-                        Class tmp = new Class();
-                        tmp.ClassId = (int)reader["id"];
-                        tmp.Name = (string)reader["name"];
-                        ClassList.Add(tmp);
+                        Lesson tmp = new Lesson();
+                        tmp.Id = (int)reader["id"];
+                        tmp.Title = (string)reader["title"];
+                        LessonList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(Class tempObj)
+        public void Create(Lesson tempObj)
         {
-            ClassList.Add(tempObj);
+            LessonList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [Classes]([name])" +
-                    "VALUES(@name)";
+                string CommandText = "INSERT INTO [Lesson]([title])" +
+                    "VALUES(@title)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
-                comm.Parameters.AddWithValue("@name", tempObj.Name);
+                comm.Parameters.AddWithValue("@title", tempObj.Title);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
-            ClassList.Clear();
-            ReadFromDB();
+            LessonList.Clear();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
-            ClassList.Clear();
-            ReadFromDB();
+            LessonList.Clear();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            for (int i = 0; i < ClassList.Count(); i++)
+            for (int i = 0; i < LessonList.Count(); i++)
             {
-                if (i == id)
+                if (LessonList[i].Id == id)
                 {
-                    ClassList.RemoveAt(i);
+                    LessonList.RemoveAt(i);
                 }
             }
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Classes WHERE user_id=@id";
+                string CommandText = "DELETE FROM Lesson WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.AddWithValue("@id", id);
                 comm.ExecuteNonQuery();
@@ -86,29 +87,27 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Class> GetEnteties()
+        public List<Lesson> GetAll()
         {
-            return ClassList;
+            return LessonList;
         }
 
-        public Class GetObj(int index)
+        public Lesson Get(int index)
         {
-            return ClassList[index];
+            return LessonList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Lesson obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
+                var cmd = new SqlCommand("spUpdateLesson", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Name", obj.Title);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

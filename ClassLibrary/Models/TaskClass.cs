@@ -8,20 +8,22 @@ namespace ClassLibrary.Models
 {
     public class TaskClass
     {
+        public int Id { get; set; }
         public int StudentId { get; set; }
         public int LessonId { get; set; }
         public string Description { get; set; }
         public DateTime DeadLine { get; set; }
-        public DateTime CloseTime {get; set; }
+        public DateTime ClosedTime {get; set; }
         public bool Status { get; set; }
-        public TaskClass(int studentId, int lessonId, string description, DateTime deadLine, DateTime closeTime, bool status)
+        public TaskClass(int studentId, int lessonId, string description, DateTime deadLine, DateTime closeTime, bool status, int id)
         {
             StudentId = studentId;
             LessonId = lessonId;
             Description = description;
             DeadLine = deadLine;
-            CloseTime = closeTime;
+            ClosedTime = closeTime;
             Status = status;
+            Id = id;
         }
         public TaskClass() { }
     }

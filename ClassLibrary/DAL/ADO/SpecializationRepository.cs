@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class SpecializationRepository:IRepository<Specialization>
+    public class SpecializationRepository : IRepository<Specialization>
     {
         List<Specialization> SpecializationList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,9 +18,9 @@ namespace ClassLibrary.DAL
         public SpecializationRepository()
         {
             SpecializationList = new List<Specialization>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
@@ -32,15 +33,15 @@ namespace ClassLibrary.DAL
                     while (reader.Read())
                     {
                         Specialization tmp = new Specialization();
-                        tmp.SpecializationID = (int)reader["id"];
-                        tmp.SpecializationName = (string)reader["name"];
+                        tmp.Id = (int)reader["id"];
+                        tmp.Name = (string)reader["name"];
                         SpecializationList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(Specialization tempObj)
+        public void Create(Specialization tempObj)
         {
             SpecializationList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
@@ -50,24 +51,24 @@ namespace ClassLibrary.DAL
                     "VALUES(@title)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
-                comm.Parameters.AddWithValue("@title", tempObj.SpecializationName);
+                comm.Parameters.AddWithValue("@title", tempObj.Name);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
             SpecializationList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             SpecializationList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
             for (int i = 0; i < SpecializationList.Count(); i++)
             {
-                if (i == id)
+                if (SpecializationList[i].Id == id)
                 {
                     SpecializationList.RemoveAt(i);
                 }
@@ -86,29 +87,26 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Specialization> GetEnteties()
+        public List<Specialization> GetAll()
         {
             return SpecializationList;
         }
 
-        public Specialization GetObj(int index)
+        public Specialization Get(int index)
         {
             return SpecializationList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Specialization obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
+                var cmd = new SqlCommand("spUpdateSpecialization", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Name", obj.Name);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

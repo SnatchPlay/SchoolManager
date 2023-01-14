@@ -1,14 +1,15 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class UserInfoRepository:IRepository<UserInfo>
+    public class UserInfoRepository : IRepository<UserInfo>
     {
         List<UserInfo> UserInfoList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
@@ -17,9 +18,9 @@ namespace ClassLibrary.DAL
         public UserInfoRepository()
         {
             UserInfoList = new List<UserInfo>();
-            ReadFromDB();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
@@ -32,10 +33,10 @@ namespace ClassLibrary.DAL
                     while (reader.Read())
                     {
                         UserInfo tmp = new UserInfo();
-                        tmp.UserId = (int)reader["id"];
+                        tmp.Id = (int)reader["id"];
                         tmp.Login = (string)reader["login"];
                         tmp.Password = (byte[])reader["password"];
-                        tmp.RoleId = (int)reader["role"];
+                        tmp.Role = (int)reader["role"];
                         tmp.Salt = (Guid)reader["salt"];
                         UserInfoList.Add(tmp);
                     }
@@ -43,7 +44,7 @@ namespace ClassLibrary.DAL
             }
 
         }
-        public void AddObj(UserInfo tempObj)
+        public void Create(UserInfo tempObj)
         {
             UserInfoList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
@@ -54,26 +55,26 @@ namespace ClassLibrary.DAL
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
                 comm.Parameters.AddWithValue("@login", tempObj.Login);
-                comm.Parameters.AddWithValue("@pass", "0x"+ BitConverter.ToString(tempObj.Password).Replace("-", "").ToLower());
-                comm.Parameters.AddWithValue("@role", tempObj.RoleId);
+                comm.Parameters.AddWithValue("@pass", "0x" + BitConverter.ToString(tempObj.Password).Replace("-", "").ToLower());
+                comm.Parameters.AddWithValue("@role", tempObj.Role);
                 comm.Parameters.AddWithValue("@salt", tempObj.Salt);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
             UserInfoList.Clear();
-            ReadFromDB();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
             UserInfoList.Clear();
-            ReadFromDB();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
             for (int i = 0; i < UserInfoList.Count(); i++)
             {
-                if (i == id)
+                if (UserInfoList[i].Id == id)
                 {
                     UserInfoList.RemoveAt(i);
                 }
@@ -92,29 +93,29 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<UserInfo> GetEnteties()
+        public List<UserInfo> GetAll()
         {
             return UserInfoList;
         }
 
-        public UserInfo GetObj(int index)
+        public UserInfo Get(int index)
         {
             return UserInfoList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(UserInfo obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
-
+                var cmd = new SqlCommand("spUpdateUserInfo", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Login", obj.Login);
+                cmd.Parameters.AddWithValue("@Password", "0x" + BitConverter.ToString(obj.Password).Replace("-", "").ToLower());
+                cmd.Parameters.AddWithValue("@Role", obj.Role);
+                cmd.Parameters.AddWithValue("@Salt", obj.Salt);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

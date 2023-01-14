@@ -1,82 +1,83 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class UserRoleRepository:IRepository<UserRole>
+    public class ClassRepository : IRepository<Class>
     {
-        List<UserRole> UserRoleList;
+        List<Class> ClassList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
         //protected string connStr = "Data Source=DESKTOP-SO70MLO;Initial Catalog=Trade v.2;Integrated Security=True";
 
-        public UserRoleRepository()
+        public ClassRepository()
         {
-            UserRoleList = new List<UserRole>();
-            ReadFromDB();
+            ClassList = new List<Class>();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[role_name] FROM [UserRole]";
+                    comm.CommandText = "SELECT [id],[name] FROM [Class]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
                     {
-                        UserRole tmp = new UserRole();
-                        tmp.UserRoleId = (int)reader["id"];
-                        tmp.Title = (string)reader["role_name"];
-                        UserRoleList.Add(tmp);
+                        Class tmp = new Class();
+                        tmp.Id = (int)reader["id"];
+                        tmp.Name = (string)reader["name"];
+                        ClassList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(UserRole tempObj)
+        public void Create(Class tempObj)
         {
-            UserRoleList.Add(tempObj);
+            ClassList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [UserRole]([name])" +
-                    "VALUES(@title)";
+                string CommandText = "INSERT INTO [Class]([name])" +
+                    "VALUES(@name)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
-                comm.Parameters.AddWithValue("@title", tempObj.Title);
+                comm.Parameters.AddWithValue("@name", tempObj.Name);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
-            UserRoleList.Clear();
-            ReadFromDB();
+            ClassList.Clear();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
-            UserRoleList.Clear();
-            ReadFromDB();
+            ClassList.Clear();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            for (int i = 0; i < UserRoleList.Count(); i++)
+            for (int i = 0; i < ClassList.Count(); i++)
             {
-                if (i == id)
+                if (ClassList[i].Id == id)
                 {
-                    UserRoleList.RemoveAt(i);
+                    ClassList.RemoveAt(i);
                 }
             }
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM UserRole WHERE id=@id";
+                string CommandText = "DELETE FROM Class WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.AddWithValue("@id", id);
                 comm.ExecuteNonQuery();
@@ -86,29 +87,27 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<UserRole> GetEnteties()
+        public List<Class> GetAll()
         {
-            return UserRoleList;
+            return ClassList;
         }
 
-        public UserRole GetObj(int index)
+        public Class Get(int index)
         {
-            return UserRoleList[index];
+            return ClassList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Class obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
+                var cmd = new SqlCommand("spUpdateClass", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Name", obj.Name);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

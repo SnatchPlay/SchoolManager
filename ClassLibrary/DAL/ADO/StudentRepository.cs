@@ -1,82 +1,85 @@
 ﻿using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary.DAL
+namespace ClassLibrary.DAL.ADO
 {
-    public class LessonRepository:IRepository<Lesson>
+    public class StudentRepository : IRepository<Student>
     {
-        List<Lesson> LessonList;
+        List<Student> StudentList;
         protected string connStr = System.Configuration.ConfigurationManager.ConnectionStrings["MyConnectionString"].ConnectionString;
         //protected string connStr = "Data Source=DESKTOP-SO70MLO;Initial Catalog=Trade v.2;Integrated Security=True";
 
-        public LessonRepository()
+        public StudentRepository()
         {
-            LessonList = new List<Lesson>();
-            ReadFromDB();
+            StudentList = new List<Student>();
+            Read();
         }
-        public void ReadFromDB()
+        public void Read()
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[title] FROM [Lessons]";
+                    comm.CommandText = "SELECT [id],[person_id],[class_id] FROM [Student]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
                     {
-                        Lesson tmp = new Lesson();
-                        tmp.LessonId = (int)reader["id"];
-                        tmp.LessonTitle = (string)reader["title"];
-                        LessonList.Add(tmp);
+                        Student tmp = new Student();
+                        tmp.Id = (int)reader["id"];
+                        tmp.PersonId = (int)reader["person_id"];
+                        tmp.ClassId = (int)reader["class_id"];
+                        StudentList.Add(tmp);
                     }
                 }
             }
 
         }
-        public void AddObj(Lesson tempObj)
+        public void Create(Student tempObj)
         {
-            LessonList.Add(tempObj);
+            StudentList.Add(tempObj);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [Lessons]([title])" +
-                    "VALUES(@title)";
+                string CommandText = "INSERT INTO [Student]([person_id],[class_id])" +
+                    "VALUES(@pid,@cid)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
-                comm.Parameters.AddWithValue("@title", tempObj.LessonTitle);
+                comm.Parameters.AddWithValue("@pid", tempObj.PersonId);
+                comm.Parameters.AddWithValue("@cid", tempObj.ClassId);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
-            LessonList.Clear();
-            ReadFromDB();
+            StudentList.Clear();
+            Read();
         }
-        public void RefreshList()
+        public void Refresh()
         {
-            LessonList.Clear();
-            ReadFromDB();
+            StudentList.Clear();
+            Read();
         }
 
-        public void DeleteObject(int id)
+        public void Delete(int id)
         {
-            for (int i = 0; i < LessonList.Count(); i++)
+            for (int i = 0; i < StudentList.Count(); i++)
             {
-                if (i == id)
+                if (StudentList[i].Id == id)
                 {
-                    LessonList.RemoveAt(i);
+                    StudentList.RemoveAt(i);
                 }
             }
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
-                string CommandText = "DELETE FROM Lessons WHERE id=@id";
+                string CommandText = "DELETE FROM Student WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.AddWithValue("@id", id);
                 comm.ExecuteNonQuery();
@@ -86,29 +89,28 @@ namespace ClassLibrary.DAL
 
 
 
-        public List<Lesson> GetEnteties()
+        public List<Student> GetAll()
         {
-            return LessonList;
+            return StudentList;
         }
 
-        public Lesson GetObj(int index)
+        public Student Get(int index)
         {
-            return LessonList[index];
+            return StudentList[index];
         }
 
-        public void UpdateField(string Table, string Field, string NewValue, int id)
+        public void Update(Student obj)
         {
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
+                var cmd = new SqlCommand("spUpdateStudent", connectionSql);
+                cmd.CommandType = CommandType.StoredProcedure;
                 connectionSql.Open();
-                string CommandText = "UPDATE @Table SET @Field =@NewValue WHERE id=@ID";
-                SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Table", Table);
-                comm.Parameters.AddWithValue("@Field", Field);
-                comm.Parameters.AddWithValue("@NewValue", NewValue);
-                comm.Parameters.AddWithValue("@ID", id);
-                comm.ExecuteNonQuery();
+                cmd.Parameters.AddWithValue("@Id", obj.Id);
+                cmd.Parameters.AddWithValue("@Person_id", obj.PersonId);
+                cmd.Parameters.AddWithValue("@Class_id", obj.ClassId);
+                cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }
 

@@ -8,11 +8,11 @@ namespace ClassLibrary.Models
 {
     public class Class
     {
-        public int ClassId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public Class(int classId, string name)
         {
-            ClassId = classId;
+            Id = classId;
             Name = name;
         }
         public Class() { }

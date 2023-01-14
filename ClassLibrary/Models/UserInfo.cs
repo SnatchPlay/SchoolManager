@@ -8,17 +8,17 @@ namespace ClassLibrary.Models
 {
     public class UserInfo
     {
-        public int UserId { get; set; }
+        public int Id { get; set; }
         public string Login { get; set; }
         public byte[] Password { get; set; }
         public Guid Salt { get; set; }
-        public int RoleId { get; set; }
+        public int Role { get; set; }
         public UserInfo(int userId, string login, byte[] password,Guid salt, int roleId)
         {
-            this.UserId = userId;
+            this.Id = userId;
             this.Login = login;
             this.Password = password;
-            this.RoleId = roleId;
+            this.Role = roleId;
             this.Salt = salt;
         }
         public UserInfo() { }

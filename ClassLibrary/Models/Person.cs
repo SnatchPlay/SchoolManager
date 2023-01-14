@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,15 +9,17 @@ namespace ClassLibrary.Models
 {
     public class Person
     {
-        public int PersonId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Lastname { get; set; }
+        [Column("birth_date")]
         public DateTime BirthDate { get; set; }
+        [Column ("user_id")]
         public int UserId { get; set; }
         public Person(int personId, string name, string surname, string lastname, DateTime birthDate, int userId)
         {
-            this.PersonId = personId;
+            this.Id = personId;
             this.Name = name;
             this.Surname = surname;
             this.Lastname = lastname;

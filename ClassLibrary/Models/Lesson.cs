@@ -8,12 +8,12 @@ namespace ClassLibrary.Models
 {
     public class Lesson
     {
-        public int LessonId { get; set; }
-        public string LessonTitle { get; set; }
+        public int Id { get; set; }
+        public string Title { get; set; }
         public Lesson(int lessonId, string lessonTitle)
         {
-            LessonId = lessonId;
-            LessonTitle = lessonTitle;
+            Id = lessonId;
+            Title = lessonTitle;
         }
         public Lesson() { }
     }

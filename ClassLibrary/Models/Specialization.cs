@@ -8,12 +8,12 @@ namespace ClassLibrary.Models
 {
     public class Specialization
     {
-        public int SpecializationID { get; set; }
-        public string SpecializationName { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
         public Specialization(int specializationID, string specializationName)
         {
-            SpecializationID = specializationID;
-            SpecializationName = specializationName;
+            Id = specializationID;
+            Name = specializationName;
         }
         public Specialization() { }
     }

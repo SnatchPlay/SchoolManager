@@ -1,4 +1,5 @@
 ﻿using ClassLibrary.DAL;
+using ClassLibrary.DAL.EF;
 using ClassLibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -10,60 +11,60 @@ namespace ClassLibrary.Factory
 {
     public class EFFactory : IFactory
     {
+        ApplicationContext applicationContext= new ApplicationContext();
         public IRepository<Class> GetClassRepository()
         {
-            throw new NotImplementedException();
+            return new ClassRepository(applicationContext) ;
         }
 
         public IRepository<Journal> GetJournalRepository()
         {
-            throw new NotImplementedException();
+            return new JournalRepository(applicationContext);
         }
 
         public IRepository<Lesson> GetLessonRepository()
         {
-            throw new NotImplementedException();
+            return new LessonRepository(applicationContext);
         }
 
         public IRepository<Person> GetPersonRepository()
         {
-            //return new EFPersonRepository;
-            return null;
+            return new PersonRepository(applicationContext);
         }
 
         public IRepository<Shedule> GetSheduleRepository()
         {
-            throw new NotImplementedException();
+            return new SheduleRepository(applicationContext);
         }
 
         public IRepository<Specialization> GetSpecializationRepository()
         {
-            throw new NotImplementedException();
+            return new SpecializationRepository(applicationContext);
         }
 
         public IRepository<Student> GetStudentRepository()
         {
-            throw new NotImplementedException();
+            return new StudentRepository(applicationContext);
         }
 
         public IRepository<TaskClass> GetTaskClassRepository()
         {
-            throw new NotImplementedException();
+            return new TaskClassRepository(applicationContext);
         }
 
         public IRepository<Teacher> GetTeacherRepository()
         {
-            throw new NotImplementedException();
+            return new TeacherRepository(applicationContext);
         }
 
         public IRepository<UserInfo> GetUserInfoRepository()
         {
-            throw new NotImplementedException();
+            return new UserInfoRepository(applicationContext);
         }
 
         public IRepository<UserRole> GetUserRoleRepository()
         {
-            throw new NotImplementedException();
+            return new UserRoleRepository(applicationContext);
         }
     }
 }
