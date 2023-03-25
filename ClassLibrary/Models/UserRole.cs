@@ -12,10 +12,14 @@ namespace ClassLibrary.Models
         public int Id { get; set; }
         [Column ("role_name")]
         public string RoleName { get; set; }
-        public UserRole(int id, string title)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public UserRole(int id, string title, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
             this.Id = id;
             this.RoleName = title;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public UserRole() { }
     }

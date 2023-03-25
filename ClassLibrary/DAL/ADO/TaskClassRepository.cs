@@ -27,7 +27,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[student_id],[lesson_id],[description],[deadline],[closedtime],[status] FROM [Task]";
+                    comm.CommandText = "SELECT [id],[student_id],[lesson_id],[description],[deadline],[closedtime],[status],[rowinserttime],[rowupdatetime] FROM [Task]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -40,6 +40,8 @@ namespace ClassLibrary.DAL.ADO
                         tmp.DeadLine = (DateTime)reader["deadline"];
                         tmp.ClosedTime = (DateTime)reader["closedtime"];
                         tmp.Status = (bool)reader["status"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
 
                         TaskClassList.Add(tmp);
                     }

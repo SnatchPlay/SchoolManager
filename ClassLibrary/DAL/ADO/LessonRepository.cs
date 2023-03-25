@@ -27,7 +27,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[title] FROM [Lesson]";
+                    comm.CommandText = "SELECT [id],[title],[rowinserttime],[rowupdatetime] FROM [Lesson]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -35,6 +35,8 @@ namespace ClassLibrary.DAL.ADO
                         Lesson tmp = new Lesson();
                         tmp.Id = (int)reader["id"];
                         tmp.Title = (string)reader["title"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
                         LessonList.Add(tmp);
                     }
                 }

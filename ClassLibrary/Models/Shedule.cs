@@ -21,13 +21,17 @@ namespace ClassLibrary.Models
         public int TeacherId { get; set; }
         [Column ("lesson_id")]
         public int LessonId { get; set; }
-        public Shedule(int dayNum, int lessonNum, int classId, int teacherId, int lessonId)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Shedule(int dayNum, int lessonNum, int classId, int teacherId, int lessonId, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            DayNum = dayNum;
-            LessonNum = lessonNum;
-            ClassId = classId;
-            TeacherId = teacherId;
-            LessonId = lessonId;
+            this.DayNum = dayNum;
+            this.LessonNum = lessonNum;
+            this.ClassId = classId;
+            this.TeacherId = teacherId;
+            this.LessonId = lessonId;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Shedule() { }
     }

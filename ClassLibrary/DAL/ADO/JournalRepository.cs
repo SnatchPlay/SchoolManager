@@ -22,7 +22,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[student_id],[day_num],[lesson_id] FROM [Journal]";
+                    comm.CommandText = "SELECT [id],[student_id],[day_num],[lesson_id],[mark],[rowinserttime],[rowupdatetime] FROM [Journal]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -32,6 +32,9 @@ namespace ClassLibrary.DAL.ADO
                         tmp.StudentId = (int)reader["student_id"];
                         tmp.DayNum = (int)reader["day_num"];
                         tmp.LessonId = (int)reader["lesson_id"];
+                        tmp.Mark = (int)reader["mark"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
                         JournalList.Add(tmp);
                     }
                 }
@@ -44,13 +47,14 @@ namespace ClassLibrary.DAL.ADO
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
                 connectionSql.Open();
-                string CommandText = "INSERT INTO [Journal]([student_id],[day_num],[lesson_id])" +
-                    "VALUES(@studentid,@daynum,@lessonid)";
+                string CommandText = "INSERT INTO [Journal]([student_id],[day_num],[lesson_id],[mark])" +
+                    "VALUES(@studentid,@daynum,@lessonid,@mark)";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
                 comm.Parameters.Clear();
                 comm.Parameters.AddWithValue("@studentid", tempObj.StudentId);
                 comm.Parameters.AddWithValue("@daynum", tempObj.DayNum);
                 comm.Parameters.AddWithValue("@lessonid", tempObj.LessonId);
+                comm.Parameters.AddWithValue("@mark", tempObj.Mark);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -107,6 +111,7 @@ namespace ClassLibrary.DAL.ADO
                 cmd.Parameters.AddWithValue("@Day_Num", obj.DayNum);
                 cmd.Parameters.AddWithValue("@Student_Id", obj.StudentId);
                 cmd.Parameters.AddWithValue("@Lesson_Id", obj.LessonId);
+                cmd.Parameters.AddWithValue("@Mark", obj.Mark);
                 cmd.ExecuteNonQuery();
                 connectionSql.Close();
             }

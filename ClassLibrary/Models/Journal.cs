@@ -16,12 +16,18 @@ namespace ClassLibrary.Models
         public int DayNum { get; set; }
         [Column ("lesson_id")]
         public int LessonId { get; set; }
-        public Journal(int studentId, int dayNum, int lessonId, int id)
+        public int Mark { get; set; }
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Journal(int studentId, int dayNum, int lessonId, int id, int mark, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            StudentId = studentId;
-            DayNum = dayNum;
-            LessonId = lessonId;
-            Id = id;
+            this.StudentId = studentId;
+            this.DayNum = dayNum;
+            this.LessonId = lessonId;
+            this.Id = id;
+            this.Mark = mark;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Journal() { }
     }

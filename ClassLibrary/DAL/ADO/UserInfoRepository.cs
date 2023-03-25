@@ -27,7 +27,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[login],[password],[role],[salt] FROM [UserInfo]";
+                    comm.CommandText = "SELECT [id],[login],[password],[role],[salt],[rowinserttime],[rowupdatetime] FROM [UserInfo]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -38,6 +38,8 @@ namespace ClassLibrary.DAL.ADO
                         tmp.Password = (byte[])reader["password"];
                         tmp.Role = (int)reader["role"];
                         tmp.Salt = (Guid)reader["salt"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
                         UserInfoList.Add(tmp);
                     }
                 }

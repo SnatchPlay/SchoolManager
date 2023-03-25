@@ -14,11 +14,15 @@ namespace ClassLibrary.Models
         public int PersonId { get; set; }
         [Column ("class_id")]
         public int ClassId { get; set; }
-        public Student(int studentId, int personId, int classId)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Student(int studentId, int personId, int classId, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            Id = studentId;
-            PersonId = personId;
-            ClassId = classId;
+            this.Id = studentId;
+            this.PersonId = personId;
+            this.ClassId = classId;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Student() { }
     }

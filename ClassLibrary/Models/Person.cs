@@ -17,7 +17,9 @@ namespace ClassLibrary.Models
         public DateTime BirthDate { get; set; }
         [Column ("user_id")]
         public int UserId { get; set; }
-        public Person(int personId, string name, string surname, string lastname, DateTime birthDate, int userId)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Person(int personId, string name, string surname, string lastname, DateTime birthDate, int userId, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
             this.Id = personId;
             this.Name = name;
@@ -25,6 +27,8 @@ namespace ClassLibrary.Models
             this.Lastname = lastname;
             this.BirthDate = birthDate;
             this.UserId = userId;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Person() { }
     }

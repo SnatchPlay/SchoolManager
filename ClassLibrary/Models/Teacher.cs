@@ -12,12 +12,16 @@ namespace ClassLibrary.Models
         public int PersonId { get; set; }
         public int ClassId { get; set; }
         public int SpecializationId { get; set; }
-        public Teacher(int id, int personId, int classId, int specializationId)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Teacher(int id, int personId, int classId, int specializationId, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            Id = id;
+            this.Id = id;
             this.PersonId = personId;
             this.ClassId = classId;
             this.SpecializationId = specializationId;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Teacher() { }
     }

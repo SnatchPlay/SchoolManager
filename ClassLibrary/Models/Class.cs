@@ -10,10 +10,14 @@ namespace ClassLibrary.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public Class(int classId, string name)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public Class(int classId, string name, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            Id = classId;
-            Name = name;
+            this.Id = classId;
+            this.Name = name;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public Class() { }
     }

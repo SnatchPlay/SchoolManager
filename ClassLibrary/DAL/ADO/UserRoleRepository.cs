@@ -28,7 +28,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[role_name] FROM [UserRole]";
+                    comm.CommandText = "SELECT [id],[role_name],[rowinserttime],[rowupdatetime] FROM [UserRole]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -36,6 +36,8 @@ namespace ClassLibrary.DAL.ADO
                         UserRole tmp = new UserRole();
                         tmp.Id = (int)reader["id"];
                         tmp.RoleName = (string)reader["role_name"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
                         UserRoleList.Add(tmp);
                     }
                 }

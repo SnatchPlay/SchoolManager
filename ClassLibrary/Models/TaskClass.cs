@@ -15,15 +15,19 @@ namespace ClassLibrary.Models
         public DateTime DeadLine { get; set; }
         public DateTime ClosedTime {get; set; }
         public bool Status { get; set; }
-        public TaskClass(int studentId, int lessonId, string description, DateTime deadLine, DateTime closeTime, bool status, int id)
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
+        public TaskClass(int studentId, int lessonId, string description, DateTime deadLine, DateTime closeTime, bool status, int id, DateTime rowInsertTime, DateTime rowUpdateTime)
         {
-            StudentId = studentId;
-            LessonId = lessonId;
-            Description = description;
-            DeadLine = deadLine;
-            ClosedTime = closeTime;
-            Status = status;
-            Id = id;
+            this.StudentId = studentId;
+            this.LessonId = lessonId;
+            this.Description = description;
+            this.DeadLine = deadLine;
+            this.ClosedTime = closeTime;
+            this.Status = status;
+            this.Id = id;
+            this.RowInsertTime = rowInsertTime;
+            this.RowUpdateTime = rowUpdateTime;
         }
         public TaskClass() { }
     }
