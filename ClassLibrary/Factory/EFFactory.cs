@@ -1,6 +1,7 @@
 ﻿using ClassLibrary.DAL;
 using ClassLibrary.DAL.EF;
 using ClassLibrary.Models;
+using DAL.DAL.EF;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,6 +66,14 @@ namespace ClassLibrary.Factory
         public IRepository<UserRole> GetUserRoleRepository()
         {
             return new UserRoleRepository(applicationContext);
+        }
+        public IRepository<Parent> GetParentRepository()
+        {
+            return new ParentRepository(applicationContext);
+        }
+        IRepository<ParentStudent> IFactory.GetParentStudentRepository()
+        {
+            return new ParentStudentRepository(applicationContext);
         }
     }
 }

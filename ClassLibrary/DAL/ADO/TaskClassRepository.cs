@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -77,23 +78,17 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<TaskClass, bool> filter)
         {
-            for (int i = 0; i < TaskClassList.Count(); i++)
-            {
-                if (TaskClassList[i].Id == id)
-                {
- 
-                    TaskClassList.RemoveAt(i);
-                }
-            }
+            TaskClass ps = TaskClassList.First(filter);
+            TaskClassList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
                 string CommandText = "DELETE FROM Task WHERE [id]=@Id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Id", id);
+                comm.Parameters.AddWithValue("@Id", ps.Id);
 
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
@@ -107,9 +102,9 @@ namespace ClassLibrary.DAL.ADO
             return TaskClassList;
         }
 
-        public TaskClass Get(int index)
+        public TaskClass Get(Func<TaskClass, bool> filter)
         {
-            return TaskClassList[index];
+            return TaskClassList.First(filter);
         }
 
         public void Update(TaskClass obj)

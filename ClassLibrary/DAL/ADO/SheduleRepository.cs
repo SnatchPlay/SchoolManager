@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,21 +74,10 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Shedule, bool> filter)
         {
-            int daynum = 0, lessonum = 0, classid = 0, teacherid = 0, lessonid = 0;
-            for (int i = 0; i < SheduleList.Count(); i++)
-            {
-                if (i == id)
-                {
-                    daynum = SheduleList[i].DayNum;
-                    lessonum = SheduleList[i].LessonNum;
-                    classid = SheduleList[i].ClassId;
-                    teacherid = SheduleList[i].TeacherId;
-                    lessonid = SheduleList[i].LessonId;
-                    SheduleList.RemoveAt(i);
-                }
-            }
+            Shedule ps = SheduleList.First(filter);
+            SheduleList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
@@ -95,11 +85,11 @@ namespace ClassLibrary.DAL.ADO
                 string CommandText = "DELETE FROM Shedule WHERE [day_num]=@daynum" +
                     " and [lesson_num]=@lnum and [class_id]=@classid and [teacher_id]=@teacherid and [lesson_id]=@lid";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@daynum", daynum);
-                comm.Parameters.AddWithValue("@classid", classid);
-                comm.Parameters.AddWithValue("@teacherid", teacherid);
-                comm.Parameters.AddWithValue("@lid", lessonid);
-                comm.Parameters.AddWithValue("@lnum", lessonum);
+                comm.Parameters.AddWithValue("@daynum", ps.DayNum);
+                comm.Parameters.AddWithValue("@classid", ps.ClassId);
+                comm.Parameters.AddWithValue("@teacherid", ps.TeacherId);
+                comm.Parameters.AddWithValue("@lid", ps.LessonId);
+                comm.Parameters.AddWithValue("@lnum", ps.LessonNum);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -112,9 +102,9 @@ namespace ClassLibrary.DAL.ADO
             return SheduleList;
         }
 
-        public Shedule Get(int index)
+        public Shedule Get(Func<Shedule, bool> filter)
         {
-            return SheduleList[index];
+            return SheduleList.First(filter);
         }
 
         public void Update(Shedule obj)

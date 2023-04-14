@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,17 +27,16 @@ namespace ClassLibrary.DAL.EF
             _context.Add(tempObj);
         }
 
-        public void Delete(int id)
+        public void Delete(Func<UserInfo, bool> filter)
         {
-            UserInfo cl = _context.UserInfo.Find(id);
-            for (int i = 0; i < UserInfoList.Count(); i++)
-            {
-                if (i == id)
-                {
-                    UserInfoList.RemoveAt(i);
-                }
-            }
+            UserInfo cl = UserInfoList.First(filter);
+            UserInfoList.Remove(cl);
             _context.Remove(cl);
+        }
+
+        public UserInfo Get(Func<UserInfo, bool> filter)
+        {
+            return _context.UserInfo.Single(filter);
         }
 
         public List<UserInfo> GetAll()
@@ -44,10 +44,7 @@ namespace ClassLibrary.DAL.EF
             return UserInfoList;
         }
 
-        public UserInfo Get(int id)
-        {
-            return _context.UserInfo.Find(id);
-        }
+
 
         public void Read()
         {
@@ -63,6 +60,7 @@ namespace ClassLibrary.DAL.EF
         public void Update(UserInfo obj)
         {
             _context.Entry(obj).State = EntityState.Modified;
+            _context.SaveChanges();
         }
     }
 }

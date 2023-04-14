@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -72,22 +73,17 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<UserInfo, bool> filter)
         {
-            for (int i = 0; i < UserInfoList.Count(); i++)
-            {
-                if (UserInfoList[i].Id == id)
-                {
-                    UserInfoList.RemoveAt(i);
-                }
-            }
+            UserInfo ps = UserInfoList.First(filter);
+            UserInfoList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
                 string CommandText = "DELETE FROM UserInfo WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@id", id);
+                comm.Parameters.AddWithValue("@id", ps.Id);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -100,9 +96,9 @@ namespace ClassLibrary.DAL.ADO
             return UserInfoList;
         }
 
-        public UserInfo Get(int index)
+        public UserInfo Get(Func<UserInfo, bool> filter)
         {
-            return UserInfoList[index];
+            return UserInfoList.First(filter);
         }
 
         public void Update(UserInfo obj)

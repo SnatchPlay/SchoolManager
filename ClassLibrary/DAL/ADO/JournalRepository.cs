@@ -1,6 +1,7 @@
 ﻿using ClassLibrary.Models;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq.Expressions;
 
 namespace ClassLibrary.DAL.ADO
 {
@@ -67,22 +68,17 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Journal, bool> filter)
         {
-            for (int i = 0; i < JournalList.Count(); i++)
-            {
-                if (JournalList[i].Id == id)
-                {
-                    JournalList.RemoveAt(i);
-                }
-            }
+            Journal ps = JournalList.First(filter);
+            JournalList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
                 string CommandText = "DELETE FROM Journal WHERE id=@Id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@Id", id);
+                comm.Parameters.AddWithValue("@Id", ps.Id);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -95,9 +91,9 @@ namespace ClassLibrary.DAL.ADO
             return JournalList;
         }
 
-        public Journal Get(int index)
+        public Journal Get(Func<Journal, bool> filter)
         {
-            return JournalList[index];
+            return JournalList.First(filter);
         }
 
         public void Update(Journal obj)

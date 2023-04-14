@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,17 +27,16 @@ namespace ClassLibrary.DAL.EF
             _context.Add(tempObj);
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Shedule, bool> filter)
         {
-            Shedule cl = _context.Shedule.Find(id);
-            for (int i = 0; i < SheduleList.Count(); i++)
-            {
-                if (i == id)
-                {
-                    SheduleList.RemoveAt(i);
-                }
-            }
+            Shedule cl = SheduleList.First(filter);
+            SheduleList.Remove(cl);
             _context.Remove(cl);
+        }
+
+        public Shedule Get(Func<Shedule, bool> filter)
+        {
+            return _context.Shedule.Single(filter);
         }
 
         public List<Shedule> GetAll()
@@ -44,10 +44,7 @@ namespace ClassLibrary.DAL.EF
             return SheduleList;
         }
 
-        public Shedule Get(int id)
-        {
-            return _context.Shedule.Find(id);
-        }
+
 
         public void Read()
         {
@@ -63,6 +60,7 @@ namespace ClassLibrary.DAL.EF
         public void Update(Shedule obj)
         {
             _context.Entry(obj).State = EntityState.Modified;
+            _context.SaveChanges();
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -66,22 +67,17 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Specialization, bool> filter)
         {
-            for (int i = 0; i < SpecializationList.Count(); i++)
-            {
-                if (SpecializationList[i].Id == id)
-                {
-                    SpecializationList.RemoveAt(i);
-                }
-            }
+            Specialization ps = SpecializationList.First(filter);
+            SpecializationList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
                 string CommandText = "DELETE FROM Specialization WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@id", id);
+                comm.Parameters.AddWithValue("@id", ps.Id);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -94,9 +90,9 @@ namespace ClassLibrary.DAL.ADO
             return SpecializationList;
         }
 
-        public Specialization Get(int index)
+        public Specialization Get(Func<Specialization, bool> filter)
         {
-            return SpecializationList[index];
+            return SpecializationList.First(filter);
         }
 
         public void Update(Specialization obj)

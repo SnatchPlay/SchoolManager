@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,17 +27,16 @@ namespace ClassLibrary.DAL.EF
             _context.Add(tempObj);
         }
 
-        public void Delete(int id)
+        public void Delete(Func<UserRole, bool> filter)
         {
-            UserRole cl = _context.UserRole.Find(id);
-            for (int i = 0; i < UserRoleList.Count(); i++)
-            {
-                if (i == id)
-                {
-                    UserRoleList.RemoveAt(i);
-                }
-            }
+            UserRole cl = UserRoleList.First(filter);
+            UserRoleList.Remove(cl);
             _context.Remove(cl);
+        }
+
+        public UserRole Get(Func<UserRole, bool> filter)
+        {
+            return _context.UserRole.Single(filter);
         }
 
         public List<UserRole> GetAll()
@@ -44,10 +44,7 @@ namespace ClassLibrary.DAL.EF
             return UserRoleList;
         }
 
-        public UserRole Get(int id)
-        {
-            return _context.UserRole.Find(id);
-        }
+
 
         public void Read()
         {
@@ -63,6 +60,7 @@ namespace ClassLibrary.DAL.EF
         public void Update(UserRole obj)
         {
             _context.Entry(obj).State = EntityState.Modified;
+            _context.SaveChanges();
         }
     }
 }

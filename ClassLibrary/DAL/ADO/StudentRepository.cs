@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -68,22 +69,17 @@ namespace ClassLibrary.DAL.ADO
             Read();
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Student, bool> filter)
         {
-            for (int i = 0; i < StudentList.Count(); i++)
-            {
-                if (StudentList[i].Id == id)
-                {
-                    StudentList.RemoveAt(i);
-                }
-            }
+            Student ps = StudentList.First(filter);
+            StudentList.Remove(ps);
             using (SqlConnection connectionSql = new SqlConnection(connStr))
             {
 
                 connectionSql.Open();
                 string CommandText = "DELETE FROM Student WHERE id=@id";
                 SqlCommand comm = new SqlCommand(CommandText, connectionSql);
-                comm.Parameters.AddWithValue("@id", id);
+                comm.Parameters.AddWithValue("@id", ps.Id);
                 comm.ExecuteNonQuery();
                 connectionSql.Close();
             }
@@ -96,9 +92,9 @@ namespace ClassLibrary.DAL.ADO
             return StudentList;
         }
 
-        public Student Get(int index)
+        public Student Get(Func<Student, bool> filter)
         {
-            return StudentList[index];
+            return StudentList.First(filter);
         }
 
         public void Update(Student obj)

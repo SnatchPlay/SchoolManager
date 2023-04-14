@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace ClassLibrary.Factory
 {
     public class ADOFactory:IFactory
@@ -24,6 +25,16 @@ namespace ClassLibrary.Factory
         public IRepository<Lesson> GetLessonRepository()
         {
             return new LessonRepository();
+        }
+
+        public IRepository<Parent> GetParentRepository()
+        {
+            return new ParentRepository();
+        }
+
+        public IRepository<ParentStudent> GetParentStudentRepository()
+        {
+            return new ParentStudentRepository();
         }
 
         public IRepository<Person> GetPersonRepository()

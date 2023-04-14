@@ -20,6 +20,8 @@ namespace ClassLibrary.Factory
         IRepository<Teacher> GetTeacherRepository();
         IRepository<UserInfo> GetUserInfoRepository();
         IRepository<UserRole> GetUserRoleRepository();
+        IRepository<ParentStudent> GetParentStudentRepository();
+        IRepository<Parent> GetParentRepository();
         
     }
 }

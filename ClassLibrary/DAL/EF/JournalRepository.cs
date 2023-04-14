@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,17 +27,16 @@ namespace ClassLibrary.DAL.EF
             _context.Add(tempObj);
         }
 
-        public void Delete(int id)
+        public void Delete(Func<Journal, bool> filter)
         {
-            Journal cl = _context.Journal.Find(id);
-            for (int i = 0; i < JournalList.Count(); i++)
-            {
-                if (i == id)
-                {
-                    JournalList.RemoveAt(i);
-                }
-            }
+            Journal cl = JournalList.First(filter);
+            JournalList.Remove(cl);
             _context.Remove(cl);
+        }
+
+        public Journal Get(Func<Journal, bool> filter)
+        {
+            return _context.Journal.Single(filter);
         }
 
         public List<Journal> GetAll()
@@ -44,10 +44,6 @@ namespace ClassLibrary.DAL.EF
             return JournalList;
         }
 
-        public Journal Get(int id)
-        {
-            return _context.Journal.Find(id);
-        }
 
         public void Read()
         {
@@ -63,6 +59,7 @@ namespace ClassLibrary.DAL.EF
         public void Update(Journal obj)
         {
             _context.Entry(obj).State = EntityState.Modified;
+            _context.SaveChanges();
         }
     }
 }

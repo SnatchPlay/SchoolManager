@@ -21,6 +21,8 @@ namespace ClassLibrary.DAL
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<ParentStudent> ParentStudents { get; set; }
+        public DbSet<Parent> Parents { get; set; }
         public ApplicationContext() : base() { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
