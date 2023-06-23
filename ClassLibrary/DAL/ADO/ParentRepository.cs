@@ -28,7 +28,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [id],[person_id],[rowinserttime],[rowupdatetime] FROM [Person]";
+                    comm.CommandText = "SELECT [id],[person_id],[rowinserttime],[rowupdatetime] FROM [Parent]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
