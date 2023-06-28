@@ -71,7 +71,7 @@ namespace ClassLibrary.Factory
         {
             return new ParentRepository(applicationContext);
         }
-        IRepository<ParentStudent> IFactory.GetParentStudentRepository()
+        public IRepository<ParentStudent> GetParentStudentRepository()
         {
             return new ParentStudentRepository(applicationContext);
         }

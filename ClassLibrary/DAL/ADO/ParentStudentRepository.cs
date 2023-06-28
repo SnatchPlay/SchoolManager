@@ -29,7 +29,7 @@ namespace ClassLibrary.DAL.ADO
                 using (SqlCommand comm = connectionSql.CreateCommand())
                 {
                     connectionSql.Open();
-                    comm.CommandText = "SELECT [parent_id],[student_id] FROM [ParentStudent]";
+                    comm.CommandText = "SELECT [parent_id],[student_id],[rowinserttime],[rowupdatetime] FROM [ParentStudent]";
 
                     SqlDataReader reader = comm.ExecuteReader();
                     while (reader.Read())
@@ -37,6 +37,8 @@ namespace ClassLibrary.DAL.ADO
                         ParentStudent tmp = new ParentStudent();
                         tmp.ParentId = (int)reader["parent_id"];
                         tmp.StudentId = (int)reader["student_id"];
+                        tmp.RowInsertTime = (DateTime)reader["rowinserttime"];
+                        tmp.RowUpdateTime = (DateTime)reader["rowupdatetime"];
                         ParentStudentList.Add(tmp);
                     }
                 }

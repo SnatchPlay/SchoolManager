@@ -1,59 +1,49 @@
-﻿using AutoMapper;
-using BLL.DTO;
-using BLL.Interfaces;
+﻿using BLL.Interfaces;
 using ClassLibrary.DAL;
 using ClassLibrary.Factory;
 using ClassLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BLL.Services
 {
     internal class UserRoleService : IUserRoleService
     {
-        private IRepository<UserRole> userroleRep;
+        private IRepository<UserRole> userRoleRep;
         public UserRoleService()
         {
-            userroleRep = FactoryProvider.GetFactory().GetUserRoleRepository();
+            userRoleRep = FactoryProvider.GetFactory().GetUserRoleRepository();
         }
         public void AddUserRole(string rolename)
         {
             UserRole userRole = new UserRole() { RoleName=rolename};
 
-            userroleRep.Create(userRole);
+            userRoleRep.Create(userRole);
         }
 
-        public UserRoleDTO GetUserRoleByName(string name)
+        public UserRole GetUserRoleByName(string name)
         {
-            var userRole=userroleRep.GetAll().Where(x => x.RoleName == name).First();
-            return new UserRoleDTO ( userRole.Id,userRole.RoleName );
+            return userRoleRep.GetAll().Where(x => x.RoleName == name).First();
+             
         }
 
-        public List<UserRoleDTO> GetUserRoles()
+        public List<UserRole> GetUserRoles()
         {
-            var mapper = new MapperConfiguration(cfg => cfg.CreateMap<UserRole, UserRoleDTO>()).CreateMapper();
-            return mapper.Map<List<UserRole>, List<UserRoleDTO>>(userroleRep.GetAll());
+            return userRoleRep.GetAll();
         }
 
-        public UserRoleDTO GetUserRolesById(int id)
+        public UserRole GetUserRolesById(int id)
         {
-            var userRole=userroleRep.Get(id);
-            return new UserRoleDTO( userRole.Id,userRole.RoleName );
+            return userRoleRep.Get(x => x.Id == id);
         }
 
         public void RemoveUserRoleById(int id)
         {
-            userroleRep.Delete(id);
+            userRoleRep.Delete(x=>x.Id==id);
         }
 
-        public void RenameUserRole(UserRoleDTO userRoleDTO,string newName)
+        public void RenameUserRole(UserRole _userRole,string newName)
         {
-            var userRole = userroleRep.Get(userRoleDTO.Id);
-            userRole.RoleName = newName;
-            userroleRep.Update(userRole);
+            _userRole.RoleName = newName;
+            userRoleRep.Update(_userRole);
         }
     }
 }

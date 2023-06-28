@@ -118,7 +118,6 @@ namespace ClassLibrary.DAL.ADO
                 cmd.Parameters.AddWithValue("@Student_Id", obj.StudentId);
                 cmd.Parameters.AddWithValue("@Lesson_Id", obj.LessonId);
                 cmd.Parameters.AddWithValue("@Description", obj.Description);
-                cmd.Parameters.AddWithValue("@Id", obj.Id);
                 cmd.Parameters.AddWithValue("@Deadline", obj.DeadLine.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Closedtime", obj.ClosedTime.ToString("yyyy-MM-dd"));
                 cmd.Parameters.AddWithValue("@Status", obj.Status);

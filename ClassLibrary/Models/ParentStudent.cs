@@ -18,6 +18,8 @@ namespace ClassLibrary.Models
         [ForeignKey("Student")]
         public int StudentId { get; set; }
         public Student Student { get; set; }
+        public DateTime RowInsertTime { get; set; }
+        public DateTime RowUpdateTime { get; set; }
     }
 
 }
