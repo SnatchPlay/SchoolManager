@@ -1,4 +1,5 @@
 ﻿using BLL.DTO;
+using ClassLibrary.Models;
 
 namespace BLL.Interfaces
 {
@@ -7,8 +8,8 @@ namespace BLL.Interfaces
         public void AddNewClass(string name);
         public void RemoveClassById(int id);
         public void RenameClassById(int id);
-        public List<ClassDTO> GetClasses();
-        public ClassDTO GetClassById(int id);
-        public ClassDTO GetClassByName(string name);
+        public List<Class> GetClasses();
+        public Class GetClassById(int id);
+        public Class GetClassByName(string name);
     }
 }
